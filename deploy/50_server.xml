@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server class="org.jpos.q2.iso.QServer" logger="Q2" name="posp-adpater">
+    <attr name="port" type="java.lang.Integer">4007</attr>
+    <attr name="maxSessions" type="java.lang.Integer">200</attr>
+    <channel name="posp-adpater-channel" class="cn.wanhui.pos.ext.HEXChannel" logger="Q2"
+             packager="org.jpos.iso.packager.GenericPackager"
+             header="6000050000603100311001">
+        <property name="override-header" value="false"/>
+        <property name="packager-config" value="cfg/packager/pos-adapter.xml"/>
+        <property name="timeout" value="120000"/>
+    </channel>
+    <request-listener class="cn.wanhui.pos.RequestListener" logger="Q2" realm="request-listener"/>
+</server>
