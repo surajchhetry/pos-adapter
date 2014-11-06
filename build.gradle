@@ -2,10 +2,13 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
+apply plugin: 'application'
 
 group = 'cn.wanhui.pos'
 version = '1.0.0'
-ext.packaging = 'jar'
+
+applicationName = 'wanda-pos-adapter'
+mainClassName = 'org.jpos.q2.Q2'
 
 targetCompatibility = '1.6'
 sourceCompatibility = '1.6'
