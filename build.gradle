@@ -1,0 +1,94 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+group = 'cn.wanhui.pos'
+version = '1.0.0'
+ext.packaging = 'jar'
+
+targetCompatibility = '1.6'
+sourceCompatibility = '1.6'
+
+idea {
+    module {
+        downloadSources = true
+    }
+}
+
+repositories {
+
+    flatDir {
+        dirs 'lib'
+    }
+
+    mavenLocal()
+
+    maven {url 'http://maven.oschina.net/content/groups/public/'}
+    mavenCentral()
+    maven {url 'http://jpos.org/maven'}
+    maven {url 'http://code.alibabatech.com/mvn/releases/'}
+}
+
+dependencies {
+    compile 'org.jpos:jpos:1.9.6'
+}
+
+task createDirs() {
+    sourceSets*.java.srcDirs*.each { it.mkdirs() }
+    sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+task libs(type: Sync) {
+    from configurations.runtime
+    into "$buildDir/lib"
+}
+
+task writeNewPom () {
+    pom {
+        project {
+            description 'protocol adapter transfer ISO8583 to HTTP request/response'
+            inceptionYear '2014'
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    distribution 'repo'
+                }
+            }
+
+            repositories {
+                repository {
+                    id 'osc'
+                    name 'osc'
+                    url 'http://maven.oschina.net/content/groups/public/'
+                }
+
+                repository {
+                    id 'central'
+                    name 'central'
+                    url 'http://repo2.maven.org/maven2/'
+                }
+
+                repository {
+                    id 'jpos'
+                    name 'jPOS Central Repository'
+                    url 'http://jpos.org/maven'
+                }
+
+                repository {
+                    id 'alibabatech'
+                    name 'alibabatech'
+                    url 'http://code.alibabatech.com/mvn/releases/'
+                }
+
+            }
+
+        }
+    }.writeTo("pom.xml")
+}

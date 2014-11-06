@@ -1,0 +1,13 @@
+.gradle
+*.iml
+*.ipr
+*.iws
+log
+build
+out
+
+# ignore eclipse project file
+.classpath
+.project
+.settings
+target
