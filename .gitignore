@@ -11,3 +11,8 @@ out
 .project
 .settings
 target
+
+
+# runtime data
+*.db
+*.lg
