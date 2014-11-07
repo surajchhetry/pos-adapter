@@ -2,13 +2,18 @@ package cn.wanhui.pos;
 
 import cn.wanhui.pos.util.Commons;
 import cn.wanhui.pos.util.LoggerUtil;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.jpos.iso.ISODate;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOSource;
 import org.jpos.util.Log;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * @author yinheli
@@ -17,21 +22,31 @@ public class Context {
 
     private static final Log log = LoggerUtil.getLog(Bootstrap.class.getSimpleName());
 
-    private static final ArrayList<String> mtiNeedMac = new ArrayList<String>(){{
-        add("0110");
-        add("0210");
-        add("0230");
-        add("0410");
-        add("0850");
-        add("0870");
-    }};
+    private static final String[] mtiNeedMac = new String[]{
+            "0110", "0210", "0230", "0410", "0850", "0870"
+    };
 
-    public ISOSource isoSource;
-    public ISOMsg reqMsg;
+    static {
+        Arrays.sort(mtiNeedMac);
+    }
 
-    public Context(ISOSource isoSource, ISOMsg reqMsg) {
+    public final SqlSessionFactory sqlSessionFactory;
+    public final ISOSource isoSource;
+    public final ISOMsg reqMsg;
+    public final String apiBaseUrl;
+
+    public Context(SqlSessionFactory sqlSessionFactory,
+                   ISOSource isoSource,
+                   ISOMsg reqMsg,
+                   String apiBaseUrl) {
+        this.sqlSessionFactory = sqlSessionFactory;
         this.isoSource = isoSource;
         this.reqMsg = reqMsg;
+        this.apiBaseUrl = apiBaseUrl;
+    }
+
+    public void returnMsg(String code) throws IOException, ISOException {
+        returnMsg(reqMsg, code);
     }
 
     public void returnMsg(ISOMsg msg, String code) throws ISOException, IOException {
@@ -52,7 +67,17 @@ public class Context {
             msg.setResponseMTI();
         }
 
-        if (msg.getString(39).equals("00") && mtiNeedMac.contains(msg.getMTI())) {
+        msg.unset(new int[]{35,36,52});
+
+        if (!msg.hasField(12)) {
+            msg.set(12, ISODate.getTime(new Date()));
+        }
+
+        if (!msg.hasField(13)) {
+            msg.set(13, ISODate.getDate(new Date()));
+        }
+
+        if (msg.getString(39).equals("00") && Arrays.binarySearch(mtiNeedMac, msg.getMTI()) >= 0) {
             msg.set(64, Commons.getMac(msg));
         }
 

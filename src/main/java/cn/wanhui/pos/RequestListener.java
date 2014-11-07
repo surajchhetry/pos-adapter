@@ -1,16 +1,22 @@
 package cn.wanhui.pos;
 
 import cn.wanhui.pos.util.Commons;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.jpos.core.Configurable;
 import org.jpos.core.Configuration;
 import org.jpos.core.ConfigurationException;
+import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISORequestListener;
 import org.jpos.iso.ISOSource;
 import org.jpos.util.Log;
 import org.jpos.util.LogSource;
 import org.jpos.util.Logger;
+import org.jpos.util.TPS;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -26,6 +32,9 @@ public class RequestListener implements ISORequestListener, Configurable, LogSou
     private ExecutorService handlerThreadPool = Executors.newCachedThreadPool(new NamedThreadFactory("request-handler-"));
 
     private Bootstrap bootstrap = new Bootstrap();
+    private SqlSessionFactory sqlSessionFactory;
+
+    private String apiBaseUrl;
 
     private static class NamedThreadFactory implements ThreadFactory {
 
@@ -48,9 +57,14 @@ public class RequestListener implements ISORequestListener, Configurable, LogSou
         }
     }
 
+    public RequestListener() throws Exception {
+        // init
+        sqlSessionFactory = new SqlSessionFactoryBuilder().build(Resources.getResourceAsStream("mybatis-config.xml"));
+    }
+
     @Override
     public void setConfiguration(Configuration configuration) throws ConfigurationException {
-        //
+        apiBaseUrl = configuration.get("apiBaseUrl");
     }
 
     @Override
@@ -58,10 +72,15 @@ public class RequestListener implements ISORequestListener, Configurable, LogSou
         handlerThreadPool.submit(new Runnable() {
             @Override
             public void run() {
+                final Context ctx = new Context(sqlSessionFactory, isoSource, isoMsg, apiBaseUrl);
                 try {
-                    bootstrap.doTrx(new Context(isoSource, isoMsg));
+                    bootstrap.doTrx(ctx);
                 } catch (Exception e) {
-                    log.error(String.format("process trans exception, the follow is request msg and exception stack: \n%s\n\n", Commons.dumpISOMsg(isoMsg)), e);
+                    log.error(String.format("process trans exception, the follow is request msg and exception stack: \n\n%s", Commons.dumpISOMsg(isoMsg)), e);
+                    try {
+                        ctx.returnMsg("96");
+                    } catch (Exception ignore) {
+                    }
                 }
             }
         });

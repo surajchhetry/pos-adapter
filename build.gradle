@@ -2,16 +2,13 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
-apply plugin: 'application'
 
 group = 'cn.wanhui.pos'
 version = '1.0.0'
 
-applicationName = 'wanda-pos-adapter'
-mainClassName = 'org.jpos.q2.Q2'
-
 targetCompatibility = '1.6'
 sourceCompatibility = '1.6'
+compileJava.options.encoding = 'UTF-8'
 
 idea {
     module {
@@ -35,6 +32,12 @@ repositories {
 
 dependencies {
     compile 'org.jpos:jpos:1.9.6'
+    compile 'mysql:mysql-connector-java:5.1.20'
+    compile 'com.alibaba:fastjson:1.1.41'
+    compile 'org.mybatis:mybatis:3.2.8'
+    compile 'org.apache.commons:commons-lang3:3.3.2'
+
+    testCompile 'junit:junit:4.10'
 }
 
 task createDirs() {
@@ -95,3 +98,5 @@ task writeNewPom () {
         }
     }.writeTo("pom.xml")
 }
+
+

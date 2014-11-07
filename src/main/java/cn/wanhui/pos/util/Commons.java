@@ -1,11 +1,18 @@
 package cn.wanhui.pos.util;
 
+import cn.wanhui.pos.data.Rsp;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jpos.iso.ISOMsg;
 import org.jpos.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.ParameterizedType;
+import java.util.Map;
 
 /**
  * @author yinheli
@@ -13,6 +20,9 @@ import java.io.PrintStream;
 public class Commons {
 
     private static final Log log = LoggerUtil.getLog(Commons.class.getSimpleName());
+
+    private static final int default_connect_timeout = 5000;
+    private static final int default_read_timeout = 60000;
 
     public static String dumpISOMsg(ISOMsg msg) {
         if (msg == null) {
@@ -34,6 +44,22 @@ public class Commons {
     }
 
     public static byte[] getMac(ISOMsg msg) {
-        return new byte[0];
+        return new byte[8];
+    }
+
+    public static <T> T sendAndReceive(String url, Map<String, String> params, Class<T> clazz) throws IOException {
+        T result = null;
+        try {
+            String content = HttpUtil.doPost(url, params, default_connect_timeout, default_read_timeout);
+            log.info(String.format("receive:%s", content));
+            if (!HttpUtil.StringUtils.isEmpty(content)) {
+                result = JSONArray.parseObject(content, clazz);
+            }
+        } catch (IOException e) {
+            log.info(String.format("exception context --> url:%s, params:\n%s", url,
+                    JSONArray.toJSONString(params, true)), e);
+            throw e;
+        }
+        return result;
     }
 }

@@ -1,9 +1,6 @@
 package cn.wanhui.pos;
 
-import cn.wanhui.pos.trx.CardsQuery;
-import cn.wanhui.pos.trx.Checkin;
-import cn.wanhui.pos.trx.TransConsume;
-import cn.wanhui.pos.trx.Trx;
+import cn.wanhui.pos.trx.*;
 import cn.wanhui.pos.util.LoggerUtil;
 import org.jpos.util.Log;
 
@@ -31,7 +28,7 @@ public class Bootstrap {
 //        put("0100/320000", "tickets_consume_reversal");    // 券消费冲正
 //        put("0100/320000", "send_verify_code");            // 发送验证码
 //        put("0100/320000", "card_active");                 // 卡激活
-//        put("0100/320000", "trans_settle");                // 结算
+        put("0500/920000", new Settle());                   // 结算
     }};
 
     public void doTrx(Context ctx) throws Exception {
@@ -42,13 +39,16 @@ public class Bootstrap {
         String key = sb.toString();
         trx = trxMap.containsKey(key) ? trxMap.get(key) : null;
 
+        String trans = trx != null ? trx.getClass().getSimpleName() : "NULL";
+
+        log.info(String.format("transCode: %s, Trx: %s", key, trans));
+
         if (trx == null) {
             ctx.returnMsg(ctx.reqMsg, "40");
             return;
         }
 
         trx.doTrx(ctx);
-
     }
 
 }

@@ -4,10 +4,12 @@
     <attr name="maxSessions" type="java.lang.Integer">200</attr>
     <channel name="posp-adpater-channel" class="cn.wanhui.pos.ext.HEXChannel" logger="Q2"
              packager="org.jpos.iso.packager.GenericPackager"
-             header="6000050000603100311001">
+             header="6000050000">
         <property name="override-header" value="false"/>
         <property name="packager-config" value="cfg/packager/pos-adapter.xml"/>
         <property name="timeout" value="120000"/>
     </channel>
-    <request-listener class="cn.wanhui.pos.RequestListener" logger="Q2" realm="request-listener"/>
+    <request-listener class="cn.wanhui.pos.RequestListener" logger="Q2" realm="request-listener">
+        <property name="apiBaseUrl" value="http://api-pos.wanhui.cn/v1"/>
+    </request-listener>
 </server>
