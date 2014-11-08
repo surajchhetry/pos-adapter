@@ -1,18 +1,14 @@
 package cn.wanhui.pos.trx;
 
-
 import cn.wanhui.pos.Context;
-import cn.wanhui.pos.data.Rsp;
+import cn.wanhui.pos.data.BaseApiResp;
 import cn.wanhui.pos.util.Commons;
-import cn.wanhui.pos.util.DESUtil;
-import cn.wanhui.pos.util.HttpUtil;
-import org.jpos.iso.ISODate;
+import cn.wanhui.pos.util.LoggerUtil;
+import com.alibaba.fastjson.JSONArray;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOUtil;
+import org.jpos.util.Log;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +16,8 @@ import java.util.Map;
  * @author yinheli
  */
 public class Checkin implements Trx {
+
+    private static final Log log = LoggerUtil.getLog(Checkin.class.getSimpleName());
 
     private static final String path = "/jpos/terminal/checkin";
 
@@ -35,7 +33,14 @@ public class Checkin implements Trx {
             put("operatorNo", reqMsg.getString(61).trim());
         }};
 
-        Result result = Commons.sendAndReceive(ctx.apiBaseUrl+path, params, Result.class);
+        String url = ctx.apiBaseUrl + path;
+        Result result = Commons.sendAndReceive(url, params, Result.class);
+
+        if (result == null) {
+            log.warn(String.format("time out!, reqMsg:\n%s\nreqURL:%s,params:%s",
+                    Commons.dumpISOMsg(reqMsg), url, JSONArray.toJSONString(params, true)));
+            return;
+        }
 
         ISOMsg msg = (ISOMsg) ctx.reqMsg.clone();
         msg.set(60, result.batchNo.getBytes());
@@ -45,7 +50,7 @@ public class Checkin implements Trx {
         ctx.returnMsg(msg, result.getStatus());
     }
 
-    public static class Result extends Rsp {
+    public static class Result extends BaseApiResp {
         private String batchNo;
         private String storeName;
         private String workingKey;

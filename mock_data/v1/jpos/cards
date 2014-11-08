@@ -1,0 +1,35 @@
+{
+    "status": "00",
+    "message": "成功",
+    "transTime": 1415125804472,
+    "pointBalance": 1,
+    "avaiablePointBalance": 120,
+    "vaucher": [
+        {
+            "id": 1,
+            "amount": 1,
+            "num": 2,
+            "name": "vv1"
+        },
+        {
+            "id": 2,
+            "amount": 5,
+            "num": 1,
+            "name": "vv2"
+        },
+        {
+            "id": 2,
+            "amount": 500,
+            "num": 20,
+            "name": "优惠哈"
+        }
+    ],
+    "idType": "01",
+    "idNo": "0123456789012345678",
+    "name": "张三",
+    "gender": "01",
+    "mobileNo": "13800000000",
+    "grade": "0",
+    "address": "北京市",
+    "email": "zhangsan@gmail.com"
+}

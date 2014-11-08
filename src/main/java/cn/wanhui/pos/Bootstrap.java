@@ -17,7 +17,7 @@ public class Bootstrap {
     private static final Map<String, Trx> trxMap = new HashMap<String, Trx>(){{
         put("0800/920000", new Checkin());                     // 签到
         put("0100/320000", new CardsQuery());                 // 卡查询
-        put("0100/320000", new TransConsume());               // 消费
+        put("0200/760000", new TransConsume());               // 消费
 //        put("0100/320000", "trans_consume_reversal");      // 消费冲正
 //        put("0100/320000", "trans_cancel");                // 消费撤销
 //        put("0100/320000", "trans_cancel_reversal");       // 消费撤销冲正

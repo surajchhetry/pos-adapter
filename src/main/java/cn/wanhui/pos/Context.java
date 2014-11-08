@@ -1,6 +1,5 @@
 package cn.wanhui.pos;
 
-import cn.wanhui.pos.util.Commons;
 import cn.wanhui.pos.util.LoggerUtil;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.jpos.iso.ISODate;
@@ -10,8 +9,6 @@ import org.jpos.iso.ISOSource;
 import org.jpos.util.Log;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -78,7 +75,8 @@ public class Context {
         }
 
         if (msg.getString(39).equals("00") && Arrays.binarySearch(mtiNeedMac, msg.getMTI()) >= 0) {
-            msg.set(64, Commons.getMac(msg));
+            // TODO  need mac?
+            // msg.set(64, Commons.getMac(msg));
         }
 
         isoSource.send(msg);

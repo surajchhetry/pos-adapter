@@ -3,7 +3,7 @@ package cn.wanhui.pos.data;
 /**
  * @author yinheli
  */
-public class Rsp {
+public class BaseApiResp {
     private String status;
     private String message;
     private Long transTime;

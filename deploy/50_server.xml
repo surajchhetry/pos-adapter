@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <server class="org.jpos.q2.iso.QServer" logger="Q2" name="posp-adpater">
-    <attr name="port" type="java.lang.Integer">4007</attr>
+    <attr name="port" type="java.lang.Integer">10001</attr>
     <attr name="maxSessions" type="java.lang.Integer">200</attr>
     <channel name="posp-adpater-channel" class="cn.wanhui.pos.ext.HEXChannel" logger="Q2"
              packager="org.jpos.iso.packager.GenericPackager"

@@ -1,17 +1,14 @@
 package cn.wanhui.pos.util;
 
-import cn.wanhui.pos.data.Rsp;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jpos.iso.ISOMsg;
 import org.jpos.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.reflect.ParameterizedType;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -47,10 +44,22 @@ public class Commons {
         return new byte[8];
     }
 
+    public static byte[] fillLeft(String str, int len, byte fill) throws UnsupportedEncodingException {
+        byte[] v = new byte[len];
+        Arrays.fill(v, fill);
+        byte[] _v = str.getBytes("gb2312");
+        int start = v.length - _v.length;
+        System.arraycopy(_v, 0, v, start, _v.length);
+        return v;
+    }
+
     public static <T> T sendAndReceive(String url, Map<String, String> params, Class<T> clazz) throws Exception {
         T result = null;
         String content = null;
+        String paramJson = null; // for debug
         try {
+            paramJson = JSONArray.toJSONString(params, true);
+            log.info(String.format("send --> url:%s, params:\n%s", url, paramJson));
             //content = HttpUtil.doPost(url, params, default_connect_timeout, default_read_timeout);
             content = HttpUtil.doGet(url, null);
             log.info(String.format("receive:%s", content));
@@ -59,7 +68,7 @@ public class Commons {
             }
         } catch (Exception e) {
             log.info(String.format("exception context --> url:%s, params:\n%s\ncontent:\n%s", url,
-                    JSONArray.toJSONString(params, true), content), e);
+                    paramJson, content), e);
             throw e;
         }
         return result;
