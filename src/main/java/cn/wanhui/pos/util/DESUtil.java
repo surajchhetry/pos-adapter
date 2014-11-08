@@ -10,9 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
-/**
- * @author yinheli
- */
 public class DESUtil {
 
     private final static String DES = "DES";

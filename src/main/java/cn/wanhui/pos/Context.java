@@ -1,7 +1,6 @@
 package cn.wanhui.pos;
 
 import cn.wanhui.pos.util.LoggerUtil;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.jpos.iso.ISODate;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
@@ -27,16 +26,13 @@ public class Context {
         Arrays.sort(mtiNeedMac);
     }
 
-    public final SqlSessionFactory sqlSessionFactory;
     public final ISOSource isoSource;
     public final ISOMsg reqMsg;
     public final String apiBaseUrl;
 
-    public Context(SqlSessionFactory sqlSessionFactory,
-                   ISOSource isoSource,
+    public Context(ISOSource isoSource,
                    ISOMsg reqMsg,
                    String apiBaseUrl) {
-        this.sqlSessionFactory = sqlSessionFactory;
         this.isoSource = isoSource;
         this.reqMsg = reqMsg;
         this.apiBaseUrl = apiBaseUrl;

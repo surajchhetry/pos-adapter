@@ -1,0 +1,82 @@
+#!/bin/sh
+# require jre/jdk 1.6+
+#
+# by yinheli <me@yinheli.com>
+
+script_dir=`dirname $0`
+APP_HOME=`cd "$script_dir"; pwd`
+echo "application home: $APP_HOME"
+cd $APP_HOME
+
+PIDFILE=$APP_HOME/.pid
+CLASSPATH=$APP_HOME/app/pos-adapter-1.0.0.jar
+
+JAVA_OPTS="-server -Xmx512M -Xms512M -XX:MaxPermSize=128m -XX:+DisableExplicitGC -Dfile.encoding=UTF-8"
+DEPLOY_DIR="deploy"
+ARGS_OPTS="-d $DEPLOY_DIR -r true"
+
+start() {
+    pid=`ps -ef | grep $APP_HOME | grep -v grep | awk '{print $2}'`
+    if [ -z "$pid" ]; then
+        rm -f $APP_HOME/$DEPLOY_DIR/shutdown.xml
+        java -cp $CLASSPATH $JAVA_OPTS cn.wanhui.pos.Boot $ARGS_OPTS > /dev/null 2>&1 &
+        #java -cp $CLASSPATH $JAVA_OPTS cn.wanhui.pos.Boot $ARGS_OPTS > console.log 2>&1 & # debug
+        echo $!>$PIDFILE
+        echo "running pid: $!"
+    else
+        echo "server is runing pid:$pid"
+    fi
+}
+
+stop() {
+    echo '<shutdown/>' > $APP_HOME/$DEPLOY_DIR/shutdown.xml
+    sleep 3s
+    rm -f $PIDFILE
+}
+
+net() {
+    netstat -anp | grep `cat $PIDFILE`
+}
+
+log() {
+    tail -fn 300 $APP_HOME/log/pos-adapter.log
+}
+
+lsof() {
+    /usr/sbin/lsof -p `cat $PIDFILE`
+}
+
+heap() {
+    dd=`date +%m%d-%H%M`
+    mkdir -p $APP_HOME/log/heap
+    jmap -histo `cat $PIDFILE` > $APP_HOME/log/heap/$dd.txt
+    jmap -dump:format=b,file=$APP_HOME/log/heap/$dd.bin `cat $PIDFILE`
+}
+
+gc() {
+    jstat -gc `cat $PIDFILE` 5000
+}
+
+case "$1" in
+    net)
+        net;;
+    log)
+        log;;
+    gc)
+        gc;;
+    lsof)
+        lsof;;
+    heap)
+        heap;;
+    start)
+        start;;
+    stop)
+        stop;;
+    restart)
+        stop
+        start;;
+    *)
+        echo "Usage: ./server {start|stop|restart|net|log|lsof|heap|gc}"
+        exit;
+esac
+exit 0;
