@@ -10,6 +10,6 @@
         <property name="timeout" value="120000"/>
     </channel>
     <request-listener class="cn.wanhui.pos.RequestListener" logger="Q2" realm="request-listener">
-        <property name="apiBaseUrl" value="http://api-pos.wanhui.cn/v1"/>
+        <property name="apiBaseUrl" value="http://127.0.0.1:9001/v1"/>
     </request-listener>
 </server>

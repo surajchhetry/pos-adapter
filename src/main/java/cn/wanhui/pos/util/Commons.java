@@ -47,17 +47,19 @@ public class Commons {
         return new byte[8];
     }
 
-    public static <T> T sendAndReceive(String url, Map<String, String> params, Class<T> clazz) throws IOException {
+    public static <T> T sendAndReceive(String url, Map<String, String> params, Class<T> clazz) throws Exception {
         T result = null;
+        String content = null;
         try {
-            String content = HttpUtil.doPost(url, params, default_connect_timeout, default_read_timeout);
+            //content = HttpUtil.doPost(url, params, default_connect_timeout, default_read_timeout);
+            content = HttpUtil.doGet(url, null);
             log.info(String.format("receive:%s", content));
             if (!HttpUtil.StringUtils.isEmpty(content)) {
                 result = JSONArray.parseObject(content, clazz);
             }
-        } catch (IOException e) {
-            log.info(String.format("exception context --> url:%s, params:\n%s", url,
-                    JSONArray.toJSONString(params, true)), e);
+        } catch (Exception e) {
+            log.info(String.format("exception context --> url:%s, params:\n%s\ncontent:\n%s", url,
+                    JSONArray.toJSONString(params, true), content), e);
             throw e;
         }
         return result;

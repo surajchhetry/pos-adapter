@@ -21,21 +21,7 @@ import java.util.Map;
  */
 public class Checkin implements Trx {
 
-    private static final byte[] keyCheck = new byte[8];
-
     private static final String path = "/jpos/terminal/checkin";
-
-    private class Result extends Rsp {
-        private String batchNo;
-
-        public String getBatchNo() {
-            return batchNo;
-        }
-
-        public void setBatchNo(String batchNo) {
-            this.batchNo = batchNo;
-        }
-    }
 
     @Override
     public void doTrx(Context ctx) throws Exception {
@@ -51,23 +37,42 @@ public class Checkin implements Trx {
 
         Result result = Commons.sendAndReceive(ctx.apiBaseUrl+path, params, Result.class);
 
-
         ISOMsg msg = (ISOMsg) ctx.reqMsg.clone();
-
-        byte[] pinkey = DESUtil.generateRandomNumber(8).getBytes();
-        byte[] mackey = DESUtil.generateRandomNumber(8).getBytes();
-
-        byte[] pinkeyWitchCheckVal = ISOUtil.concat(pinkey, ISOUtil.trim(DESUtil.encrypt(keyCheck, pinkey), 4));
-        byte[] mackeyWitchCheckVal = ISOUtil.concat(mackey, ISOUtil.trim(DESUtil.encrypt(keyCheck, mackey), 4));
-
-        msg.set(60, "000001".getBytes());
-        msg.set(61, "测试商户".getBytes("gb2312"));
-
-        msg.set(62, ISOUtil.concat(pinkeyWitchCheckVal, mackeyWitchCheckVal));
-
+        msg.set(60, result.batchNo.getBytes());
+        msg.set(61, result.storeName.getBytes("gb2312"));
+        msg.set(62, ISOUtil.hex2byte(result.workingKey));
         msg.unset(63);
+        ctx.returnMsg(msg, result.getStatus());
+    }
 
-        ctx.returnMsg(msg, "00");
+    public static class Result extends Rsp {
+        private String batchNo;
+        private String storeName;
+        private String workingKey;
+
+        public String getBatchNo() {
+            return batchNo;
+        }
+
+        public void setBatchNo(String batchNo) {
+            this.batchNo = batchNo;
+        }
+
+        public String getStoreName() {
+            return storeName;
+        }
+
+        public void setStoreName(String storeName) {
+            this.storeName = storeName;
+        }
+
+        public String getWorkingKey() {
+            return workingKey;
+        }
+
+        public void setWorkingKey(String workingKey) {
+            this.workingKey = workingKey;
+        }
     }
 
 }
