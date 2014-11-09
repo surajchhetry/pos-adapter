@@ -7,6 +7,6 @@ import cn.wanhui.pos.Context;
  */
 public interface Trx {
 
-    public void doTrx(Context ctx) throws Exception;
+    public void doTrx(Context ctx, boolean isReversal) throws Exception;
 
 }

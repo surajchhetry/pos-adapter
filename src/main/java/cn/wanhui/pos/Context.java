@@ -77,4 +77,12 @@ public class Context {
 
         isoSource.send(msg);
     }
+
+    public void setTime(ISOMsg msg, long transTime) throws ISOException {
+        if (transTime > 0) {
+            Date date = new Date(transTime * 1000);
+            msg.set(12, ISODate.getTime(date));
+            msg.set(13, ISODate.getDate(date));
+        }
+    }
 }

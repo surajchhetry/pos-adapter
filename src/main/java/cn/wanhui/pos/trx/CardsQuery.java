@@ -26,7 +26,7 @@ public class CardsQuery implements Trx {
     private static final String path = "/jpos/cards";
 
     @Override
-    public void doTrx(Context ctx) throws Exception {
+    public void doTrx(Context ctx, boolean isReversal) throws Exception {
         final ISOMsg reqMsg = ctx.reqMsg;
 
         Map<String, String> params = new HashMap<String, String>(){{
@@ -54,6 +54,8 @@ public class CardsQuery implements Trx {
 
         ISOMsg msg = (ISOMsg) ctx.reqMsg.clone();
 
+        BigDecimal m100 = new BigDecimal("100");
+
         // f60
         // 当前积分余额+当前可用积分+代金券
         ByteArrayOutputStream f60 = new ByteArrayOutputStream();
@@ -63,8 +65,8 @@ public class CardsQuery implements Trx {
         ByteArrayOutputStream f62 = new ByteArrayOutputStream();
 
         try {
-            f60.write(StringUtils.leftPad(new BigDecimal(result.pointBalance).multiply(new BigDecimal(100)).toString(), 12).getBytes());
-            f60.write(StringUtils.leftPad(new BigDecimal(result.avaiablePointBalance).multiply(new BigDecimal(100)).toString(), 12).getBytes());
+            f60.write(StringUtils.leftPad(new BigDecimal(result.pointBalance).multiply(m100).toString(), 12).getBytes());
+            f60.write(StringUtils.leftPad(new BigDecimal(result.avaiablePointBalance).multiply(m100).toString(), 12).getBytes());
             f60.write(StringUtils.leftPad("0", 12).getBytes());
             f60.write(StringUtils.leftPad("0", 12).getBytes());
             f60.write(StringUtils.leftPad("0", 12).getBytes());
@@ -78,7 +80,7 @@ public class CardsQuery implements Trx {
             for (Vaucher v : result.getVaucher()) {
                 // f60
                 BigDecimal amount = new BigDecimal(Double.toString(v.getAmount()));
-                amount = amount.multiply(new BigDecimal("100"));
+                amount = amount.multiply(m100);
                 f60.write(StringUtils.leftPad(amount.longValue() + "", 6).getBytes());
                 f60.write(StringUtils.leftPad(Integer.toString(v.getNum()), 2).getBytes());
 

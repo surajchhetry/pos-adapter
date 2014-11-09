@@ -60,7 +60,7 @@ public class Commons {
         try {
             paramJson = JSONArray.toJSONString(params, true);
             log.info(String.format("send --> url:%s, params:\n%s", url, paramJson));
-            //content = HttpUtil.doPost(url, params, default_connect_timeout, default_read_timeout);
+//            content = HttpUtil.doPost(url, params, default_connect_timeout, default_read_timeout);
             content = HttpUtil.doGet(url, null);
             log.info(String.format("receive:%s", content));
             if (!HttpUtil.StringUtils.isEmpty(content)) {

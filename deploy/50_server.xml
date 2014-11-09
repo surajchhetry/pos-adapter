@@ -11,5 +11,6 @@
     </channel>
     <request-listener class="cn.wanhui.pos.RequestListener" logger="Q2" realm="request-listener">
         <property name="apiBaseUrl" value="http://127.0.0.1:9001/v1"/>
+        <!--<property name="apiBaseUrl" value="http://10.1.171.109:8080"/>-->
     </request-listener>
 </server>

@@ -22,7 +22,7 @@ public class Checkin implements Trx {
     private static final String path = "/jpos/terminal/checkin";
 
     @Override
-    public void doTrx(Context ctx) throws Exception {
+    public void doTrx(Context ctx, boolean isReversal) throws Exception {
 
         final ISOMsg reqMsg = ctx.reqMsg;
 
@@ -43,6 +43,7 @@ public class Checkin implements Trx {
         }
 
         ISOMsg msg = (ISOMsg) ctx.reqMsg.clone();
+        ctx.setTime(msg, result.getTransTime());
         msg.set(60, result.batchNo.getBytes());
         msg.set(61, result.storeName.getBytes("gb2312"));
         msg.set(62, ISOUtil.hex2byte(result.workingKey));

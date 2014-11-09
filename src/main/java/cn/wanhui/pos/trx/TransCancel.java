@@ -2,7 +2,6 @@ package cn.wanhui.pos.trx;
 
 import cn.wanhui.pos.Context;
 import cn.wanhui.pos.data.BaseApiResp;
-import cn.wanhui.pos.data.Vaucher;
 import cn.wanhui.pos.util.Commons;
 import cn.wanhui.pos.util.LoggerUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -11,33 +10,34 @@ import org.jpos.iso.ISOMsg;
 import org.jpos.util.Log;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author yinheli
  */
-public class TransConsume implements Trx {
+public class TransCancel implements Trx {
 
-    private static final Log log = LoggerUtil.getLog(TransConsume.class.getSimpleName());
+    private static final Log log = LoggerUtil.getLog(TransCancel.class.getSimpleName());
 
-    private static final String path = "/jpos/trans/consume";
+    private static final String path = "/jpos/trans/cancel";
 
-    private static final String reversalPath = "/jpos/trans/consumeReversal";
+    private static final String reversalPath = "/jpos/trans/cancelReversal";
 
     @Override
     public void doTrx(Context ctx, boolean isReversal) throws Exception {
-
         final ISOMsg reqMsg = ctx.reqMsg;
 
         Map params = new HashMap(){{
             put("traceNo", reqMsg.getString(11));
-            put("batchNo", reqMsg.getString(60));
             put("storeNo", reqMsg.getString(42));
             put("terminalNo", reqMsg.getString(41));
-            put("cardNo", reqMsg.getString(2));
+
+            if (reqMsg.hasField(2)) {
+                put("cardNo", reqMsg.getString(2));
+            }
 
             if (reqMsg.hasField(35)) {
                 put("track2", reqMsg.getString(35));
@@ -52,30 +52,14 @@ public class TransConsume implements Trx {
             }
 
             put("consumeType", reqMsg.getString(22));
+            put("oriSerialNo", reqMsg.getString(37));
 
-            String f63 = new String(reqMsg.getBytes(63));
-            BigDecimal m100 = new BigDecimal("100");
-            double cashAmount =  new BigDecimal(f63.substring(0, 12)).divide(m100).doubleValue();
-            int pointAmount = Integer.parseInt(f63.substring(12, 24));
-
-            put("pointAmount", pointAmount);
-            put("cashAmount",  cashAmount);
-
-            String registerTraceNo = f63.substring(37, 48);
-
-            String vaucherStr = f63.substring(48);
-            int vaucherLen = 22;
-            int vaucherCount = vaucherStr.length() / vaucherLen;
-            List<Vaucher> vaucher = new ArrayList<Vaucher>();
-            for (int i = 0; i < vaucherCount; i++) {
-                int start =  i * vaucherLen;
-                String id =  vaucherStr.substring(start, start+20);
-                String num = vaucherStr.substring(start+20, start+vaucherLen);
-                vaucher.add(new Vaucher(Long.parseLong(id), Integer.parseInt(num)));
-            }
-
-            put("vaucher", JSONArray.toJSONString(vaucher));
-            put("registerTraceNo", registerTraceNo);
+            String f60 = new String(reqMsg.getBytes(60));
+            put("oriBatchNo", f60.substring(0, 6));
+            put("oriTraceNo", f60.substring(6, 12));
+            String time = Calendar.getInstance().get(Calendar.YEAR)+f60.substring(12, 22);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhss");
+            put("oriTransTime", sdf.parse(time).getTime()/1000);
         }};
 
         String url = ctx.apiBaseUrl + (isReversal ? reversalPath : path);
@@ -108,18 +92,16 @@ public class TransConsume implements Trx {
         f60.append(StringUtils.leftPad("", 18));
 
         msg.set(60, f60.toString().getBytes());
-        msg.set(62, result.advertisement.getBytes("gb2312"));
 
         ctx.returnMsg(msg, result.getStatus());
     }
 
     public static class Result extends BaseApiResp {
         private String serialNo;
-        private int pointBalance;
-        private int avaiablePointBalance;
-        private int usePoint;
-        private int persentPoint;
-        private String advertisement;
+        private double pointBalance;
+        private double avaiablePointBalance;
+        private double usePoint;
+        private double persentPoint;
 
         public String getSerialNo() {
             return serialNo;
@@ -129,44 +111,36 @@ public class TransConsume implements Trx {
             this.serialNo = serialNo;
         }
 
-        public int getPointBalance() {
+        public double getPointBalance() {
             return pointBalance;
         }
 
-        public void setPointBalance(int pointBalance) {
+        public void setPointBalance(double pointBalance) {
             this.pointBalance = pointBalance;
         }
 
-        public int getAvaiablePointBalance() {
+        public double getAvaiablePointBalance() {
             return avaiablePointBalance;
         }
 
-        public void setAvaiablePointBalance(int avaiablePointBalance) {
+        public void setAvaiablePointBalance(double avaiablePointBalance) {
             this.avaiablePointBalance = avaiablePointBalance;
         }
 
-        public int getUsePoint() {
+        public double getUsePoint() {
             return usePoint;
         }
 
-        public void setUsePoint(int usePoint) {
+        public void setUsePoint(double usePoint) {
             this.usePoint = usePoint;
         }
 
-        public int getPersentPoint() {
+        public double getPersentPoint() {
             return persentPoint;
         }
 
-        public void setPersentPoint(int persentPoint) {
+        public void setPersentPoint(double persentPoint) {
             this.persentPoint = persentPoint;
-        }
-
-        public String getAdvertisement() {
-            return advertisement;
-        }
-
-        public void setAdvertisement(String advertisement) {
-            this.advertisement = advertisement;
         }
     }
 }
