@@ -6,15 +6,7 @@ package cn.wanhui.pos.data;
 public class BaseApiResp {
     private String status;
     private String message;
-    private Long transTime;
-
-    public Long getTransTime() {
-        return transTime;
-    }
-
-    public void setTransTime(Long transTime) {
-        this.transTime = transTime;
-    }
+    private long transTime;
 
     public String getStatus() {
         return status;
@@ -30,5 +22,13 @@ public class BaseApiResp {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public long getTransTime() {
+        return transTime;
+    }
+
+    public void setTransTime(long transTime) {
+        this.transTime = transTime;
     }
 }

@@ -53,6 +53,14 @@ public class Commons {
         return v;
     }
 
+    public static byte[] fillRight(String str, int len, byte fill) throws UnsupportedEncodingException {
+        byte[] v = new byte[len];
+        Arrays.fill(v, fill);
+        byte[] _v = str.getBytes("gb2312");
+        System.arraycopy(_v, 0, v, 0, _v.length);
+        return v;
+    }
+
     public static <T> T sendAndReceive(String url, Map<String, String> params, Class<T> clazz) throws Exception {
         T result = null;
         String content = null;

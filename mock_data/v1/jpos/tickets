@@ -1,0 +1,26 @@
+{
+    "status": "00",
+    "message": "成功",
+    "transTime": 1415125804472,
+    "serialNo": "100000000231",
+    "pointBalance": 1,
+    "avaiablePointBalance": 1,
+    "usePoint": 0,
+    "persentPoint": 0,
+    "ticket": [
+        {
+            "id": 1,
+            "type": "01",
+            "amount": 10,
+            "name": "xx团购券",
+            "num": 5
+        },
+        {
+            "id": 2,
+            "type": "03",
+            "amount": 100,
+            "name": "xx代金券",
+            "num": 10
+        }
+    ]
+}

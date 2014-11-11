@@ -60,7 +60,7 @@ public class Context {
             msg.setResponseMTI();
         }
 
-        msg.unset(new int[]{35,36,52});
+        //msg.unset(new int[]{35,36,52});
 
         if (!msg.hasField(12)) {
             msg.set(12, ISODate.getTime(new Date()));
